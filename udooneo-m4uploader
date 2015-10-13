@@ -1,0 +1,140 @@
+#!/bin/bash
+#
+# udooneo-m4uploader.sh frontend for load and startup M4 core
+#
+# Copyright (C) 2015-2016 Giuseppe Pagano <giuseppe.pagano@seco.com>
+# Copyright (C) 2015-2016 Ettore Chimenti <ek5.chimenti@gmail.com>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+# 
+#
+
+# Setting Environment
+
+up=mqx_upload_on_m4SoloX
+
+FW_CLEAN=${FW_CLEAN:-/boot/m4clean.fw}
+FW_LAST=${FW_LAST:-/var/opt/m4/m4last.fw}
+
+unset FW_INPUT
+unset VERBOSE
+
+# Functions 
+
+usage() {
+# $1 text
+# $2 exitcode
+
+  [[ -n $1 ]] && echo $1
+
+  cat << EOF
+Usage: $0 [option] fw_filename.bin
+
+UDOO Neo MQX Uploader Frontend
+Options:
+    -v        Verbose output
+
+EOF
+    exit ${2:-0}
+}
+
+error() {
+  #error($E_TEXT,$E_CODE)
+
+  local E_TEXT=$1
+  local E_CODE=$2
+  
+  [[ -z $E_CODE ]] && E_CODE=1
+  [[ -z $E_TEXT ]] || echo $E_TEXT >&2
+  exit $E_CODE
+}
+
+ok() {
+  #ok($OK_TEXT)
+  local OK_TEXT=$1
+  [[ -z $OK_TEXT ]] && OK_TEXT="Success!!"
+  [[ -z $OK_TEXT ]] || echo $OK_TEXT 
+  exit 0
+}
+
+checkroot() {
+  if [ $(id -u) -ne 0 ] 
+  then
+    error "You're not root!"
+  fi
+}
+
+flash() {
+  local INPUT=$1
+  [[ -z $INPUT ]] && error "flash: function require an argument" 4
+
+  $up "$FW_CLEAN" 2>&1
+  (( $? )) && echo "warning: uploading clean firmware failed" >&2
+
+  $up "$INPUT" 2>&1
+  (( $? )) && error "flash: uploading input firmware failed" 4
+}
+
+#Start!
+
+#argument parsing
+while (( $# )) 
+do 
+  case $1 in
+    -h|--help) usage;;
+    -v) shift; VERBOSE=1;;
+    #    -c|--clean) shift ; CLEAN=1;; 
+    *) 
+      # many files provided
+      [[ -n $FW_INPUT ]] && usage "Too many filenames!" 1
+      FW_INPUT="$1" 
+      shift ;;
+  esac
+done  
+
+# no input provided
+[[ -z $FW_INPUT ]] && 
+  if [ -t 0 ] 
+  then
+    # Terminal input (keyboard) - interactive
+
+    # input not provided
+    usage "Sure you provided something?" 1
+
+  else
+    # File or pipe input - non-interactive
+
+    # create tmp file
+    FW_INPUT=`mktemp` || error "Cannot create tmp file" 2
+    # read from stdin
+    cat > "$FW_INPUT" || error "Error receiving input file" 2 
+  fi
+
+#input not valid
+[[ ! -s $FW_INPUT ]] && usage "Binary file not valid" 2
+
+[[ ! -s $FW_CLEAN ]] && usage "Clean file not valid" 3
+
+#flash it
+if (( $VERBOSE ))
+then 
+  flash "$FW_INPUT" 
+else 
+  flash "$FW_INPUT" >/dev/null
+fi
+
+#copy binary for next reboot
+cp "$FW_INPUT" "$FW_LAST" || error "Error copying last bin" 5
+
+ok

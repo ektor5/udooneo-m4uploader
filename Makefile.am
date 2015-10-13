@@ -4,7 +4,7 @@
 
 AUTOMAKE_OPTIONS = foreign
 bin_PROGRAMS = mqx_upload_on_m4SoloX
-dist_bin_SCRIPTS = udooneo-m4uploader.sh
-dist_fw_DATA = m4startup.fw clean.fw
+dist_bin_SCRIPTS = udooneo-m4uploader
+dist_fw_DATA = m4startup.fw m4clean.fw
 mqx_upload_on_m4SoloX_SOURCES = mqx_upload_on_m4SoloX.c
-fwdir = /boot
+fwdir = $(destdir)/boot
