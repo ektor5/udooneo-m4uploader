@@ -1,0 +1,19 @@
+Source: udooneo-m4uploader
+Section: main
+Priority: optional
+Maintainer: Ettore Chimenti <ek5.chimenti@gmail.com>
+Build-Depends: debhelper (>= 9), autotools-dev
+Standards-Version: 3.9.6
+Homepage: http://udoo.org
+#Vcs-Git: git://anonscm.debian.org/collab-maint/udooneo-m4uploader.git
+Vcs-Browser: https://github.com/ektor5/udooneo-m4uploader
+
+Package: udooneo-m4uploader
+Architecture: armhf
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Load an MQX binary to UDOO Neo M4 Core
+ This application works as an uploader that loads compiled 
+ binaries into UDOO Neo DDR RAM and runs it.
+ Also copy the last binary to /var/opt/m4 for next reboot. 
+
+   
