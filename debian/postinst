@@ -19,18 +19,18 @@ set -e
 
 
 case "$1" in
-    configure)
-	install -d -m 775 -g dialout /var/opt/m4/
-	chmod +s /usr/bin/mqx_upload_on_m4SoloX
+  configure)
+    install -d -m 775 -g dialout /var/opt/m4/
+    chmod +s /usr/bin/mqx_upload_on_m4SoloX
     ;;
 
-    abort-upgrade|abort-remove|abort-deconfigure)
-	rm -r /var/opt/m4/
+  abort-upgrade|abort-remove|abort-deconfigure)
+    rm -r /var/opt/m4/
     ;;
 
-    *)
-        echo "postinst called with unknown argument \`$1'" >&2
-        exit 1
+  *)
+    echo "postinst called with unknown argument \`$1'" >&2
+    exit 1
     ;;
 esac
 

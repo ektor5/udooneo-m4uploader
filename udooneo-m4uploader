@@ -24,7 +24,9 @@
 
 up=mqx_upload_on_m4SoloX
 
-VERSION=0.1.0
+VERSION=0.1.1
+GROUP=dialout
+
 FW_CLEAN=${FW_CLEAN:-/boot/m4clean.fw}
 FW_LAST=${FW_LAST:-/var/opt/m4/m4last.fw}
 
@@ -142,6 +144,6 @@ else
 fi
 
 #copy binary for next reboot
-cp "$FW_INPUT" "$FW_LAST" || error "Error copying last bin" 5
+install -m 664 -g "$GROUP" "$FW_INPUT" "$FW_LAST" || error "Error copying last bin" 5
 
 ok

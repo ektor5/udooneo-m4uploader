@@ -15,5 +15,3 @@ Description: Load an MQX binary to UDOO Neo M4 Core
  This application works as an uploader that loads compiled 
  binaries into UDOO Neo DDR RAM and runs it.
  Also copy the last binary to /var/opt/m4 for next reboot. 
-
-   

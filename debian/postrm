@@ -20,13 +20,13 @@ set -e
 
 
 case "$1" in
-    purge|remove|upgrade|failed-upgrade|abort-install|abort-upgrade|disappear)
-	rm -rf /var/opt/m4/
+  purge|remove|upgrade|failed-upgrade|abort-install|abort-upgrade|disappear)
+    rm -rf /var/opt/m4/
     ;;
 
-    *)
-        echo "postrm called with unknown argument \`$1'" >&2
-        exit 1
+  *)
+    echo "postrm called with unknown argument \`$1'" >&2
+    exit 1
     ;;
 esac
 

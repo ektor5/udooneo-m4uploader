@@ -15,18 +15,18 @@ set -e
 
 
 case "$1" in
-    install|upgrade)
-	rm -rf /var/opt/m4/
-	rm -f /boot/m4clean.fw
-	rm -f /boot/m4startup.fw
+  install|upgrade)
+    rm -rf /var/opt/m4/
+    rm -f /boot/m4clean.fw
+    rm -f /boot/m4startup.fw
     ;;
 
-    abort-upgrade)
+  abort-upgrade)
     ;;
 
-    *)
-        echo "preinst called with unknown argument \`$1'" >&2
-        exit 1
+  *)
+    echo "preinst called with unknown argument \`$1'" >&2
+    exit 1
     ;;
 esac
 
