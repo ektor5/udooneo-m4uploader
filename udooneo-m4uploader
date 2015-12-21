@@ -24,6 +24,7 @@
 
 up=mqx_upload_on_m4SoloX
 
+VERSION=0.1.0
 FW_CLEAN=${FW_CLEAN:-/boot/m4clean.fw}
 FW_LAST=${FW_LAST:-/var/opt/m4/m4last.fw}
 
@@ -31,6 +32,10 @@ unset FW_INPUT
 unset VERBOSE
 
 # Functions 
+version() {
+  echo "v$VERSION"
+  exit 0
+}
 
 usage() {
 # $1 text
@@ -43,7 +48,8 @@ Usage: $0 [option] fw_filename.bin
 
 UDOO Neo MQX Uploader Frontend
 Options:
-    -v        Verbose output
+    -v          Verbose output
+    --version   Show version
 
 EOF
     exit ${2:-0}
@@ -93,6 +99,7 @@ while (( $# ))
 do 
   case $1 in
     -h|--help) usage;;
+    --version) version;;
     -v) shift; VERBOSE=1;;
     #    -c|--clean) shift ; CLEAN=1;; 
     *) 
