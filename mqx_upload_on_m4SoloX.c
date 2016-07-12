@@ -31,6 +31,8 @@
 #include <sys/types.h>
 #include <sys/mman.h>
   
+#define VERSION	"mqx_upload_on_m4SoloX 1.0.0"
+
 #define MAP_SIZE 4096UL
 #define MAP_MASK (MAP_SIZE - 1)
 
@@ -205,6 +207,8 @@ int main(int argc, char **argv) {
 	off_t target;
 	char *p;
 
+	printf ("\n%s\n", VERSION);
+
 	char *filepath;
 	filepath = (char *)malloc(150);
 
@@ -242,8 +246,8 @@ int main(int argc, char **argv) {
 
 	srcscr_unset_bit(fd, ~(M4c_RST));
         sleep(0.1);
-	srcscr_set_bit(fd, M4c_CL_RST);
 
         close(fd);
         return 0;
 }
+
