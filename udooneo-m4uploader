@@ -23,11 +23,11 @@
 # Setting Environment
 
 up=mqx_upload_on_m4SoloX
+stop=m4_stop
 
-VERSION=0.1.1
+VERSION=0.2.0
 GROUP=dialout
 
-FW_CLEAN=${FW_CLEAN:-/boot/m4clean.fw}
 FW_LAST=${FW_LAST:-/var/opt/m4/m4last.fw}
 
 unset FW_INPUT
@@ -87,8 +87,8 @@ flash() {
   local INPUT=$1
   [[ -z $INPUT ]] && error "flash: function require an argument" 4
 
-  $up "$FW_CLEAN" 2>&1
-  (( $? )) && echo "warning: uploading clean firmware failed" >&2
+  $stop 2>&1
+  (( $? )) && error "flash: stopping M4 core failed" 4
 
   $up "$INPUT" 2>&1
   (( $? )) && error "flash: uploading input firmware failed" 4
@@ -103,7 +103,6 @@ do
     -h|--help) usage;;
     --version) version;;
     -v) shift; VERBOSE=1;;
-    #    -c|--clean) shift ; CLEAN=1;; 
     *) 
       # many files provided
       [[ -n $FW_INPUT ]] && usage "Too many filenames!" 1
@@ -132,8 +131,6 @@ done
 
 #input not valid
 [[ ! -s $FW_INPUT ]] && usage "Binary file not valid" 2
-
-[[ ! -s $FW_CLEAN ]] && usage "Clean file not valid" 3
 
 #flash it
 if (( $VERBOSE ))
