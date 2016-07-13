@@ -1,0 +1,33 @@
+#
+# udoofota-server - server start script
+#
+
+description "UDOO M4 Autostart"  
+author "UDOO Team <social@udoo.org>"
+
+env USER=root
+env PATH=/sbin:/bin:/usr/bin
+env FW_LAST=/var/opt/m4/m4last.fw
+env LOG=/var/log/udoofota-server.log
+env UP=/usr/bin/udooneo-m4uploader 
+
+start on local-filesystems
+stop on [06]
+
+pre-start script
+  echo "[`date -u '+%F %T %Z'`] (sys) Starting" >> $LOG
+
+  test -x $UP || 
+    { 
+      stop
+      echo "[`date -u '+%F %T %Z'`] (sys) Error: uploader not found" >> $LOG
+      exit 0 
+    } 
+end script
+
+exec $UP $FW_LAST
+
+pre-stop script
+  echo "[`date -u '+%F %T %Z'`] (sys) Stopping" >> $LOG
+end script
+ 
