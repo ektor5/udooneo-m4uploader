@@ -22,6 +22,16 @@ case "$1" in
   configure)
     install -d -m 775 -g dialout /var/opt/m4/
     chmod +s /usr/bin/mqx_upload_on_m4SoloX
+    chmod +s /usr/bin/m4_stop
+
+    if ! grep -q "m4boot=false" /boot/uEnv.txt
+    then
+      cat <<-'EOF' >> /boot/uEnv.txt
+				# M4 sketch load from uboot is DEPRECATED
+				# Don't remove the following line! 
+				m4boot=false
+			EOF
+    fi
     ;;
 
   abort-upgrade|abort-remove|abort-deconfigure)
