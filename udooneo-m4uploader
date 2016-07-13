@@ -140,7 +140,11 @@ else
   flash "$FW_INPUT" >/dev/null
 fi
 
-#copy binary for next reboot
-install -m 664 -g "$GROUP" "$FW_INPUT" "$FW_LAST" || error "Error copying last bin" 5
+#copy binary for next reboot if different
+if [[ $FW_INPUT != "$FW_LAST" ]]
+then
+  install -m 664 -g "$GROUP" "$FW_INPUT" "$FW_LAST" || 
+    error "Error copying last bin" 5
+fi
 
 ok
