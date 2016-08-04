@@ -50,6 +50,7 @@ Usage: $0 [option] fw_filename.bin
 
 UDOO Neo MQX Uploader Frontend
 Options:
+    -r,--reset  Reset M4, simply reloading last sketch
     -v          Verbose output
     --version   Show version
 
@@ -102,6 +103,7 @@ do
   case $1 in
     -h|--help) usage;;
     --version) version;;
+    -r|--reset) FW_INPUT="$FW_LAST";;
     -v) shift; VERBOSE=1;;
     *) 
       # many files provided
