@@ -23,7 +23,6 @@
 # Setting Environment
 
 up=mqx_upload_on_m4SoloX
-stop=m4_stop
 
 VERSION=0.2.0
 GROUP=dialout
@@ -88,10 +87,7 @@ flash() {
   local INPUT=$1
   [[ -z $INPUT ]] && error "flash: function require an argument" 4
 
-  $stop 2>&1
-  (( $? )) && error "flash: stopping M4 core failed" 4
-
-  $up "$INPUT" 2>&1
+  $up "$INPUT"
   (( $? )) && error "flash: uploading input firmware failed" 4
 }
 
@@ -137,9 +133,9 @@ done
 #flash it
 if (( $VERBOSE ))
 then 
-  flash "$FW_INPUT" 
+  flash "$FW_INPUT"
 else 
-  flash "$FW_INPUT" >/dev/null
+  flash "$FW_INPUT" 1>/dev/null
 fi
 
 #copy binary for next reboot if different

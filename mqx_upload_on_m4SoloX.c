@@ -273,7 +273,7 @@ int main(int argc, char **argv) {
 	filepath = (char *)malloc(150);
 
 	if (argc < 2) {
-		printf("\n\t%s - Usage: %s <project_name> [0xLOADADDR]\n\n", NAME_OF_BOARD, argv[0]);
+		fprintf(stderr, "\n\t%s - Usage: %s <project_name> [0xLOADADDR]\n\n", NAME_OF_BOARD, argv[0]);
 		return (RETURN_CODE_ARGUMENTS_ERROR);
 	}
 		
@@ -305,12 +305,12 @@ int main(int argc, char **argv) {
 			printf ("%s - Waiting M4 Stop, m4TraceFlags: %08X \n", NAME_OF_BOARD, m4TraceFlags);
 			if((m4TraceFlags & MSK12_SHARED_TRACE_FLAGS) != 0) {
 				m4IsStopped = 1;
-				printf ("%s - Stopped M4 sketck \n",NAME_OF_BOARD);
+				printf ("%s - Stopped M4 sketch \n",NAME_OF_BOARD);
 			}
 		}
 		send_m4_stop_flag(fd, 0x00);
 		if (m4IsStopped == 0) {
-			printf ("%s - Failed to Stop M4 sketck: reboot system ! \n",NAME_OF_BOARD);
+			fprintf (stderr, "%s - Failed to Stop M4 sketch: reboot system ! \n",NAME_OF_BOARD);
 		    close(fd);
 			exit (RETURN_CODE_M4STOP_FAILED);
 		}
@@ -349,11 +349,11 @@ int main(int argc, char **argv) {
 		if((m4TraceFlags & (MSK6_SHARED_TRACE_FLAGS | MSK7_SHARED_TRACE_FLAGS | MSK8_SHARED_TRACE_FLAGS | MSK9_SHARED_TRACE_FLAGS)) == 
 			(MSK6_SHARED_TRACE_FLAGS | MSK7_SHARED_TRACE_FLAGS | MSK8_SHARED_TRACE_FLAGS | MSK9_SHARED_TRACE_FLAGS)) {
 			m4IsRunning = 1;
-			printf ("%s - M4 sketck is running\n", NAME_OF_BOARD);
+			printf ("%s - M4 sketch is running\n", NAME_OF_BOARD);
 		}
 	}
 	if (m4IsRunning == 0) {
-		printf ("%s - Failed to Start M4 sketck: reboot system ! \n", NAME_OF_BOARD);
+		fprintf (stderr, "%s - Failed to Start M4 sketch: reboot system ! \n", NAME_OF_BOARD);
 	    close(fd);
 		exit (RETURN_CODE_M4START_FAILED);
 	}

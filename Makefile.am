@@ -3,8 +3,7 @@
 # UDOO Boards
 
 AUTOMAKE_OPTIONS = foreign
-bin_PROGRAMS = mqx_upload_on_m4SoloX m4_stop
+bin_PROGRAMS = mqx_upload_on_m4SoloX
 dist_bin_SCRIPTS = udooneo-m4uploader
 mqx_upload_on_m4SoloX_SOURCES = mqx_upload_on_m4SoloX.c
-m4_stop_SOURCES = m4_stop.c
 fwdir = $(destdir)/boot
