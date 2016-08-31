@@ -27,6 +27,13 @@ up=mqx_upload_on_m4SoloX
 VERSION=0.3.0
 GROUP=dialout
 
+RETURN_CODE_OK=0
+RETURN_CODE_ARGUMENTS_ERROR=1
+RETURN_CODE_M4STOP_FAILED=2
+RETURN_CODE_M4START_FAILED=3
+RETURN_CODE_M4UPLOADER_FAIL=4
+RETURN_CODE_LASTSKETCH_FAIL=5
+
 FW_LAST=${FW_LAST:-/var/opt/m4/m4last.fw}
 
 unset FW_INPUT
@@ -35,7 +42,7 @@ unset VERBOSE
 # Functions 
 version() {
   echo "v$VERSION"
-  exit 0
+  exit $RETURN_CODE_OK
 }
 
 usage() {
@@ -72,8 +79,8 @@ ok() {
   #ok($OK_TEXT)
   local OK_TEXT=$1
   [[ -z $OK_TEXT ]] && OK_TEXT="Success!!"
-  [[ -z $OK_TEXT ]] || echo $OK_TEXT 
-  exit 0
+  [[ -z $OK_TEXT ]] || echo $OK_TEXT
+  exit $RETURN_CODE_OK
 }
 
 checkroot() {
@@ -85,10 +92,12 @@ checkroot() {
 
 flash() {
   local INPUT=$1
-  [[ -z $INPUT ]] && error "flash: function require an argument" 4
+  [[ -z $INPUT ]] && error "flash: function require an argument" $RETURN_CODE_ARGUMENTS_ERROR
 
   $up "$INPUT"
-  (( $? )) && error "flash: uploading input firmware failed" 4
+  up_exit=$?
+
+  (( up_exit )) && error "flash: uploading input firmware failed" $up_exit
 }
 
 #Start!
@@ -103,8 +112,8 @@ do
     -v) shift; VERBOSE=1;;
     *) 
       # many files provided
-      [[ -n $FW_INPUT ]] && usage "Too many filenames!" 1
-      FW_INPUT="$1" 
+      [[ -n $FW_INPUT ]] && usage "Too many filenames!" $RETURN_CODE_ARGUMENTS_ERROR
+      FW_INPUT="$1"
       shift ;;
   esac
 done  
@@ -116,19 +125,19 @@ done
     # Terminal input (keyboard) - interactive
 
     # input not provided
-    usage "Sure you provided something?" 1
+    usage "Sure you provided something?" $RETURN_CODE_ARGUMENTS_ERROR
 
   else
     # File or pipe input - non-interactive
 
     # create tmp file
-    FW_INPUT=`mktemp` || error "Cannot create tmp file" 2
+    FW_INPUT=`mktemp` || error "Cannot create tmp file" $RETURN_CODE_M4UPLOADER_FAIL
     # read from stdin
-    cat > "$FW_INPUT" || error "Error receiving input file" 2 
+    cat > "$FW_INPUT" || error "Error receiving input file" $RETURN_CODE_M4UPLOADER_FAIL
   fi
 
 #input not valid
-[[ ! -s $FW_INPUT ]] && usage "Binary file not valid" 2
+[[ ! -s $FW_INPUT ]] && usage "Binary file not valid" $RETURN_CODE_M4UPLOADER_FAIL
 
 #flash it
 if (( $VERBOSE ))
@@ -141,8 +150,8 @@ fi
 #copy binary for next reboot if different
 if [[ $FW_INPUT != "$FW_LAST" ]]
 then
-  install -m 664 -g "$GROUP" "$FW_INPUT" "$FW_LAST" || 
-    error "Error copying last bin" 5
+  install -m 664 -g "$GROUP" "$FW_INPUT" "$FW_LAST" ||
+    error "Error copying last bin" $RETURN_CODE_LASTSKETCH_FAIL
 fi
 
 ok
