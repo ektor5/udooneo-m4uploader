@@ -24,7 +24,7 @@
 
 up=mqx_upload_on_m4SoloX
 
-VERSION=0.2.0
+VERSION=0.3.0
 GROUP=dialout
 
 FW_LAST=${FW_LAST:-/var/opt/m4/m4last.fw}
