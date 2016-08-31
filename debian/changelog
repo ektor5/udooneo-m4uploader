@@ -1,3 +1,9 @@
+udooneo-m4uploader (0.3.0-1) trusty; urgency=low
+
+  * Emit fail/success status
+
+ -- Ettore Chimenti <ek5.chimenti@gmail.com>  Wed, 31 Aug 2016 15:47:36 +0000
+
 udooneo-m4uploader (0.2.0-1) trusty; urgency=low
 
   * Initial release 
