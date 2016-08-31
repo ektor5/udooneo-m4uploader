@@ -13,11 +13,11 @@
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-# 
+#
 #
 
 # Setting Environment
@@ -39,7 +39,7 @@ FW_LAST=${FW_LAST:-/var/opt/m4/m4last.fw}
 unset FW_INPUT
 unset VERBOSE
 
-# Functions 
+# Functions
 version() {
   echo "v$VERSION"
   exit $RETURN_CODE_OK
@@ -69,7 +69,7 @@ error() {
 
   local E_TEXT=$1
   local E_CODE=$2
-  
+
   [[ -z $E_CODE ]] && E_CODE=1
   [[ -z $E_TEXT ]] || echo $E_TEXT >&2
   exit $E_CODE
@@ -84,7 +84,7 @@ ok() {
 }
 
 checkroot() {
-  if [ $(id -u) -ne 0 ] 
+  if [ $(id -u) -ne 0 ]
   then
     error "You're not root!"
   fi
@@ -103,24 +103,24 @@ flash() {
 #Start!
 
 #argument parsing
-while (( $# )) 
-do 
+while (( $# ))
+do
   case $1 in
     -h|--help) usage;;
     --version) version;;
     -r|--reset) FW_INPUT="$FW_LAST";;
     -v) shift; VERBOSE=1;;
-    *) 
+    *)
       # many files provided
       [[ -n $FW_INPUT ]] && usage "Too many filenames!" $RETURN_CODE_ARGUMENTS_ERROR
       FW_INPUT="$1"
       shift ;;
   esac
-done  
+done
 
 # no input provided
-[[ -z $FW_INPUT ]] && 
-  if [ -t 0 ] 
+[[ -z $FW_INPUT ]] &&
+  if [ -t 0 ]
   then
     # Terminal input (keyboard) - interactive
 
@@ -141,9 +141,9 @@ done
 
 #flash it
 if (( $VERBOSE ))
-then 
+then
   flash "$FW_INPUT"
-else 
+else
   flash "$FW_INPUT" 1>/dev/null
 fi
 
