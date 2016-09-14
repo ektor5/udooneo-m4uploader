@@ -279,6 +279,11 @@ int main(int argc, char **argv) {
 		
 	sprintf(filepath, "%s", argv[1]);
 
+	if(access(filepath, F_OK) == -1) {
+		fprintf(stderr, "\n\tFile %s not found.\n", argv[1]);
+                return RETURN_CODE_ARGUMENTS_ERROR;
+	}
+
 	if (argc == 3) {
 		loadaddr = strtoul(argv[2], &p, 16);
 	} else {
