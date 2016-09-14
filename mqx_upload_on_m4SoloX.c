@@ -92,7 +92,7 @@ void send_m4_stop_flag(int fd, unsigned char value) {
 
     target = ADDR_SHARED_BYTE_FOR_M4STOP;
     map_base = mmap(0, MAP_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, fd, target & ~MAP_MASK);
-    virt_addr = map_base + (target & MAP_MASK);
+    virt_addr = (unsigned char *)map_base + (target & MAP_MASK);
     *((unsigned char *) virt_addr) = value;
     munmap(map_base, MAP_SIZE);
 }
@@ -103,7 +103,7 @@ void reset_m4_trace_flag(int fd) {
 
     target = ADDR_SHARED_TRACE_FLAGS;
     map_base = mmap(0, MAP_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, fd, target & ~MAP_MASK);
-    virt_addr = map_base + (target & MAP_MASK);
+    virt_addr = (unsigned char *)map_base + (target & MAP_MASK);
     *((int *) virt_addr) = 0L;
     munmap(map_base, MAP_SIZE);
 }
@@ -115,7 +115,7 @@ int get_m4_trace_flag(int fd) {
 
     target = ADDR_SHARED_TRACE_FLAGS;
     map_base = mmap(0, MAP_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, fd, target & ~MAP_MASK);
-    virt_addr = map_base + (target & MAP_MASK);
+    virt_addr = (unsigned char *)map_base + (target & MAP_MASK);
     value = *((int *) virt_addr);
     munmap(map_base, MAP_SIZE);
 	return (value);
@@ -128,14 +128,14 @@ void set_gate_m4_clk(int fd) {
 
         target = 0x020c4074;
         map_base = mmap(0, MAP_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, fd, target & ~MAP_MASK);
-        virt_addr = map_base + (target & MAP_MASK);
+        virt_addr = (unsigned char *)map_base + (target & MAP_MASK);
         read_result = *((unsigned long *) virt_addr);
         *((unsigned long *) virt_addr) = read_result | 0x0000000C;
         munmap(map_base, MAP_SIZE);
 }
 
 void srcscr_set_bit(int fd, unsigned int set_mask) {
-	void *virt_addr; 
+	void *virt_addr;
 	unsigned long read_result;
 	virt_addr = mmap(0, SIZE_4BYTE, PROT_READ | PROT_WRITE, MAP_SHARED, fd, (off_t) SRC_SCR);
 	read_result = *((unsigned long *) virt_addr);
@@ -144,7 +144,7 @@ void srcscr_set_bit(int fd, unsigned int set_mask) {
 }
 
 void srcscr_unset_bit(int fd, unsigned int unset_mask) {
-	void *virt_addr; 
+	void *virt_addr;
 	unsigned long read_result;
 	virt_addr = mmap(0, SIZE_4BYTE, PROT_READ | PROT_WRITE, MAP_SHARED, fd, (off_t) SRC_SCR);
 	read_result = *((unsigned long *) virt_addr);
@@ -157,32 +157,32 @@ void set_stack_pc(int fd, unsigned int stack, unsigned int pc) {
 	unsigned long read_result;
 	void *map_base, *virt_addr; 
 	map_base = mmap(0, SIZE_16BYTE, PROT_READ | PROT_WRITE, MAP_SHARED, fd, (off_t) target);
-	virt_addr = map_base + (target & MAP_MASK);
+	virt_addr = (unsigned char *)map_base + (target & MAP_MASK);
 	*((unsigned long *) virt_addr) = stack;
-	virt_addr = map_base + ((target + 0x4) & MAP_MASK);
+	virt_addr = (unsigned char *)map_base + ((target + 0x4) & MAP_MASK);
 	*((unsigned long *) virt_addr) = pc;
 	munmap(map_base, SIZE_16BYTE);
 }
 
 void rdc_reset(int fd) {
 	int n;
-	void *map_base, *virt_addr; 
+	void *map_base, *virt_addr;
 	off_t target;
 
 	target = (off_t) RDC_BASE;
 	map_base = mmap(0, SIZE_4KBYTE, PROT_READ | PROT_WRITE, MAP_SHARED, fd, target);
 
-	virt_addr = map_base + RDC_MR_MRC1;
+	virt_addr = (unsigned char *)map_base + RDC_MR_MRC1;
 	*((unsigned long *) virt_addr) = 0xff;
-	virt_addr = map_base + RDC_MR_MRVS1;
+	virt_addr = (unsigned char *)map_base + RDC_MR_MRVS1;
 	*((unsigned long *) virt_addr) = 0x0;
 
 	for (n=0; n<110; n++) {
-		virt_addr = map_base + RDC_PDA_BASE + (n*0x4);
+		virt_addr = (unsigned char *)map_base + RDC_PDA_BASE + (n*0x4);
 		*((unsigned long *) virt_addr) = 0xFF;
 	}
 
-	virt_addr = map_base + RDC_MDA1;
+	virt_addr = (unsigned char *)map_base + RDC_MDA1;
 	*((unsigned long *) virt_addr) = 0x0;
 
 	munmap(map_base, SIZE_4KBYTE);
@@ -190,7 +190,7 @@ void rdc_reset(int fd) {
 
 
 void aips123_reset(int fd) {
-	void *virt_addr; 
+	void *virt_addr;
 	unsigned long read_result;
 
 	virt_addr = mmap(0, SIZE_4BYTE, PROT_READ | PROT_WRITE, MAP_SHARED, fd, (off_t) AIPS1_BASE);
@@ -215,7 +215,7 @@ int load_m4_fw(int fd, char *filepath, unsigned int loadaddr) {
 	FILE *fdf;
 	off_t target;
 	char *filebuffer;
-	void *map_base, *virt_addr; 
+	void *map_base, *virt_addr;
 	unsigned long stack, pc;
 
 	fdf = fopen(filepath, "rb");
@@ -224,13 +224,13 @@ int load_m4_fw(int fd, char *filepath, unsigned int loadaddr) {
 	fseek(fdf, 0, SEEK_SET);
 	if (size > MAX_FILE_SIZE) {
 		printf("%s - File size too big, can't load: %d > %d \n", NAME_OF_BOARD, size, MAX_FILE_SIZE);
-		return -2; 
+		return -2;
 	}
 	filebuffer = (char *)malloc(size+1);
-	if (size != fread(filebuffer, sizeof(char), size, fdf)) { 
+	if (size != fread(filebuffer, sizeof(char), size, fdf)) {
 		free(filebuffer);
-		return -2; 
-	} 
+		return -2;
+	}
 
 	fclose(fdf);
 
@@ -244,20 +244,20 @@ int load_m4_fw(int fd, char *filepath, unsigned int loadaddr) {
 
 	map_base = mmap(0, MAP_OCRAM_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, fd, loadaddr & ~MAP_OCRAM_MASK);
 	printf("%s - start - end (0x%08x - 0x%08x)\n", NAME_OF_BOARD, loadaddr & ~MAP_OCRAM_MASK, (loadaddr & ~MAP_OCRAM_MASK) + MAP_OCRAM_SIZE);
-	virt_addr = map_base + (loadaddr & MAP_OCRAM_MASK);
+	virt_addr = (unsigned char *)map_base + (loadaddr & MAP_OCRAM_MASK);
 	memcpy(virt_addr, filebuffer, size);
 	munmap(map_base, MAP_OCRAM_SIZE);
 
 	set_stack_pc(fd, stack, pc);
 	free(filebuffer);
 
-	return size; 
+	return size;
 }
 
 int main(int argc, char **argv) {
 	int fd, n, size, size2;
 	int update_fw = 1;
-	void *map_base, *virt_addr; 
+	void *map_base, *virt_addr;
 	unsigned long stack, pc, loadaddr;
 	unsigned long read_result, writeval;
 	off_t target;
@@ -276,7 +276,7 @@ int main(int argc, char **argv) {
 		fprintf(stderr, "\n\t%s - Usage: %s <project_name> [0xLOADADDR]\n\n", NAME_OF_BOARD, argv[0]);
 		return (RETURN_CODE_ARGUMENTS_ERROR);
 	}
-		
+
 	sprintf(filepath, "%s", argv[1]);
 
 	if(access(filepath, F_OK) == -1) {
