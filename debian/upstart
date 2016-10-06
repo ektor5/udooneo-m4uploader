@@ -10,6 +10,7 @@ env PATH=/sbin:/bin:/usr/bin
 env FW_LAST=/var/opt/m4/m4last.fw
 env LOG=/var/log/udoofota-server.log
 env UP=/usr/bin/udooneo-m4uploader 
+env CMDLINE=/proc/cmdline
 
 start on local-filesystems
 stop on [06]
@@ -23,9 +24,16 @@ pre-start script
       echo "[`date -u '+%F %T %Z'`] (sys) Error: uploader not found" >> $LOG
       exit 0 
     } 
+
+  test -n "$( awk '( /uart_from_osc/ && /clk_ignore_unused/ && /cpuidle.off=1/ )' $CMDLINE )" ||
+    {
+      stop
+      echo "[`date -u '+%F %T %Z'`] (sys) Error: M4 is disabled via cmdline" >> $LOG
+      exit 0 
+    } 
 end script
 
-exec $UP $FW_LAST
+exec "$UP" "$FW_LAST"
 
 pre-stop script
   echo "[`date -u '+%F %T %Z'`] (sys) Stopping" >> $LOG
