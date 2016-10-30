@@ -152,6 +152,7 @@ if [[ $FW_INPUT != "$FW_LAST" ]]
 then
   install -m 664 -g "$GROUP" "$FW_INPUT" "$FW_LAST" ||
     error "Error copying last bin" $RETURN_CODE_LASTSKETCH_FAIL
+  sync
 fi
 
 ok
