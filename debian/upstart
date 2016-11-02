@@ -2,14 +2,15 @@
 # udoofota-server - server start script
 #
 
-description "UDOO M4 Autostart"  
+description "UDOO M4 Autostart"
 author "UDOO Team <social@udoo.org>"
 
 env USER=root
 env PATH=/sbin:/bin:/usr/bin
 env FW_LAST=/var/opt/m4/m4last.fw
-env UP=/usr/bin/udooneo-m4uploader 
+env UP=/usr/bin/udooneo-m4uploader
 env CMDLINE=/proc/cmdline
+env M4DTS='/proc/device-tree/reserved-memory/m4@0x84000000/'
 
 start on local-filesystems
 stop on [06]
@@ -17,26 +18,41 @@ stop on [06]
 console log
 
 pre-start script
-  echo "[`date -u '+%F %T %Z'`] (sys) Starting" 
+  echo "[`date -u '+%F %T %Z'`] (sys) Starting"
 
-  test -x $UP || 
-    { 
+  test -x $UP ||
+    {
       stop
-      echo "[`date -u '+%F %T %Z'`] (sys) Error: uploader not found" 
-      exit 0 
-    } 
+      echo "[`date -u '+%F %T %Z'`] (sys) Error: uploader not found"
+      exit 0
+    }
+
+  test -f $FW_LAST ||
+    {
+      stop
+      echo "[`date -u '+%F %T %Z'`] (sys) Warning: No last sketch found at $FW_LAST"
+      exit 0
+    }
+
+  test -d $M4DTS ||
+    {
+      stop
+      echo "[`date -u '+%F %T %Z'`] (sys) Warning: M4 is disabled via device-tree"
+      exit 0
+    }
 
   test -n "$( awk '( /uart_from_osc/ && /clk_ignore_unused/ && /cpuidle.off=1/ )' $CMDLINE )" ||
     {
       stop
-      echo "[`date -u '+%F %T %Z'`] (sys) Warning: M4 is disabled via cmdline" 
-      exit 0 
-    } 
+      echo "[`date -u '+%F %T %Z'`] (sys) Warning: M4 is disabled via cmdline"
+      echo "[`date -u '+%F %T %Z'`] (sys) It have to include either: uart_from_osc clk_ignore_unused cpuidle.off=1"
+      exit 0
+    }
 end script
 
 exec "$UP" "$FW_LAST"
 
 pre-stop script
-  echo "[`date -u '+%F %T %Z'`] (sys) Stopping" 
+  echo "[`date -u '+%F %T %Z'`] (sys) Stopping"
 end script
- 
+
